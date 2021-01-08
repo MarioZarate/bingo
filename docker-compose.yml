@@ -1,0 +1,30 @@
+version: '3.5'
+
+networks:
+  servicesnet:
+    name: networkservices
+    driver: bridge
+
+services:
+  php-fpm:
+    build: ./docker/php-fpm
+    container_name: bingo_php
+    volumes:
+      - ./:/var/www/html/
+      - ./docker/php-fpm/php.ini:/usr/local/etc/php/php.ini
+    networks:
+      - servicesnet
+    extra_hosts:
+      - "url-container:172.18.0.3"
+
+  nginx:
+    image: nginx
+    container_name: bingo_nginx
+    ports:
+      - 8888:80
+    networks:
+      - servicesnet
+    volumes:
+      - ./:/var/www/html/
+      - ./docker/nginx/:/etc/nginx/conf.d/
+      - ./docker/logs:/var/log/nginx
